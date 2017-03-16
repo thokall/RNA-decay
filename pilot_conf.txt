@@ -1,0 +1,7 @@
+sample_name	experiment	cells	time_point	metadata
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 0h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	0	
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 1h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	1	
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 2h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	2	
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 4h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	4	
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 8h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	8	
+/proj/b2015023/private/nobackup/sept_2015_BRIC_seq_analysis/pilot/mapped/ 16h_rep1Aligned.sortedByCoord.out.bam	pilot	S2	16
