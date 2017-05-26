@@ -1,11 +1,12 @@
 apply_expression_cutoff <- function(DGEList = obj, earlyCPM_cutoff = 2, CountCutoff = 10){
   ## Takes a DGEList object as an input and outputs the filtered DGEList object
   ## The samples must be named after the time point "t" followed by a number, eg "t0", "t1", "t2"
-  ## filter on cpm of t0, t1, t3
+  ## filter on cpm of t0, t1, t2
   ## filter on sum of raw count
   ## recalculates library size
   ## prints to screen the number of genes filtered out and how many genes are left
   
+  obj <- DGEList
   all_rows <- nrow(obj)
   keep <- rowSums(cpm(obj)) > CountCutoff
   obj <- obj[keep, , keep.lib.sizes = FALSE]
