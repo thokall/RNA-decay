@@ -15,9 +15,27 @@ trim_late_time_points <- function(DGeList =obj, CPMcutoff= 0.5){
     }
     return(x)
   })
-  
-  obj$trimmed <- t(q)
+
+  obj$cpm_trimmed <- t(q)
   obj
   
+  
+  
+  # q <- apply(q,1, function(x){
+  #   for(i in 1:(length(x))){
+  #     if(i < length(x)){
+  #       if(((x[i+1]-x[i])/x[i]) > 0.2 & !is.na(x[i]) & !is.na(x[i+1])){
+  #         x[i+1] <-NA
+  #       }
+  #     }
+  #     if(is.na(x[i])) {
+  #       x[i+1] <- NA
+  #     }
+  #   }
+  #   return(x)
+  # })
+  # 
+  # obj$cpm_trimmed <- t(q)
+  # obj
   
 }

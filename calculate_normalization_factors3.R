@@ -4,7 +4,7 @@
 calculate_normalization_factors3 <- function(DGEList = obj, method = c("average", "median", "peak")){
   
   #get the data, only keep the complete rows for calculation of correction coefficients
-  data <- cpm(DGEList$trimmed, lib.size = DGEList$samples$lib.size)
+  data <- DGEList$cpm_trimmed
   data <- data[complete.cases(data),]
 
   ##create a time point vector that fits the main data
@@ -27,11 +27,13 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
     else{
     corr_coeffs <- rbind(corr_coeffs,fitted(fit)/data[i,])
     }
+    
+
   }
   
   # write new normalization factors in the object
   corr_coeffs_no_NA <- corr_coeffs[complete.cases(corr_coeffs),]
-  if(method == "average"){
+  if(method == "mean"){
     DGEList$samples$norm.factors <- apply(corr_coeffs_no_NA, 2, mean)
   }
   if(method == "median"){
@@ -50,11 +52,13 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
   
   ###PLots the distribution of the normalization factors for each time point
   par(mfrow = c(3,2), main = method,oma = c(0, 0, 2, 0))
-  for(i in 1:6){
+  for(i in 1:length(DGEList$samples$norm.factors)){
     plot(density(corr_coeffs_no_NA[,i]), main = paste(" t =", colnames(corr_coeffs_no_NA)[i]))
   }
   mtext(paste("Distribution of correction coefficients"), outer = TRUE, cex = 1.5)
-  DGEList$cpm_trimmed_normalized <- apply(DGEList$trimmed,2,function(x){x*DGEList$samples$norm.factors})
+
+  DGEList$cpm_trimmed_normalized <- t(t(DGEList$cpm_trimmed)*DGEList$samples$norm.factors)
+  
   return(DGEList)
   
   
