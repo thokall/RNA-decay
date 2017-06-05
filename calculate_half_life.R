@@ -45,6 +45,6 @@ calculate_half_life <- function(DGEList = obj){
     results <- rbind(results, c(hl_nls, hl_lm))
   }#end for loop
   names(results) <- c("hl_nls","hl_lm")
-  results <- cbind(DGEList$genes, results)
+  results <- cbind(DGEList$genes[,c("genes","chromosome_name","symbol")], results)
   return(results)
 }#end function
