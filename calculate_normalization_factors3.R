@@ -13,6 +13,7 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
   ##loop over the genes to use for normalization and collect normalization factors
   ##normalization factors are coefficients that transform the curve into a perfect logarithmic decay
   corr_coeffs <- as.data.frame(data[0,])
+  slopes <- numeric()
   for(i in 1:nrow(data)){
     # adjust the length of the time point vector to the actual data
     names(corr_coeffs) <- t
@@ -22,14 +23,29 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
     #fit
     values <- data[i,]
     fit = tryCatch(nls(values ~ a*exp(-b*realt), data=list(realt,values), start=list(a= data[i,1],b=0.1)), error=function(e){print(paste("fitting failed row:" ,i))})
+    
+    ifelse(grepl("fitting failed",fit), slope <- NA, slope <- coef(fit)[["b"]])
+    
+    #exclude correction coefficients from negative slopes or failed fitting
     if(grepl("fitting failed",fit)){
-      corr_coeffs <- rbind(corr_coeffs, values*NA)}
+      corr_coeffs <- rbind(corr_coeffs, values*NA)
+      slopes <- c(slopes,NA)
+
+    }
+    
+    else if(slope < 0){
+      slopes <- c(slopes,NA)
+    }
     else{
-    corr_coeffs <- rbind(corr_coeffs,fitted(fit)/data[i,])
+      corr_coeffs <- rbind(corr_coeffs,fitted(fit)/data[i,])
+      slopes <- c(slopes, slope)
+    }
+    
+   
     }
     
 
-  }
+ 
   
   # write new normalization factors in the object
   corr_coeffs_no_NA <- corr_coeffs[complete.cases(corr_coeffs),]
@@ -62,11 +78,8 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
   return(DGEList)
   
   
-  
-  
-  
-  ### Plots
-  
+
+
 }#closes function
 
 
