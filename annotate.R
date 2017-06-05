@@ -3,6 +3,7 @@ annotate <- function(DGEList = obj, organism = c("dmel","other")){
   ## Takes a DGEList object as an input and outputs the annotated DGEList object
   ## Annotates with chromosome name, symbol, start position, stop position
   ## only available for drosophila melanogaster at the moment
+  obj <- DGEList
   if(organism == "dmel"){
     library("biomaRt")
     #mart <- useMart("ensembl", dataset="dmelanogaster_gene_ensembl")
