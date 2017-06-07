@@ -1,10 +1,13 @@
 #Use non transformed data set fit nls
 
+library(nls2)
 
 calculate_normalization_factors3 <- function(DGEList = obj, method = c("average", "median", "peak")){
   
   #get the data, only keep the complete rows for calculation of correction coefficients
-  data <- DGEList$cpm_trimmed
+  obj <- DGEList
+  data <- DGEList$cpm_trimmed #uncomment this line and comment next to inverse the order of trimming/ normalization
+  #data <- cpm(obj)
   data <- data[complete.cases(data),]
 
   ##create a time point vector that fits the main data
@@ -19,13 +22,26 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
     names(corr_coeffs) <- t
     t <- as.numeric(t)
     realt <- suppressWarnings(t+data[i,]-data[i,])
-
+    
+    ##Normalize the data so that t0 = 1
+    values <- data[i,]/rep(data[i,1],length(realt))
+    #values <- data[i,]
+    #print(values)
+    
     #fit
-    values <- data[i,]
-    fit = tryCatch(nls(values ~ a*exp(-b*realt), data=list(realt,values), start=list(a= data[i,1],b=0.1)), error=function(e){print(paste("fitting failed row:" ,i))})
+    #fit = tryCatch(nls(values ~ a*exp(-b*realt), data=list(realt,values), start=list(a= data[i,1],b=0.1)), error=function(e){print(paste("fitting failed row:" ,i))})
+    #fit = tryCatch(nls(values ~ a*exp(-b*realt), data=list(realt,values), start=list(a= 1,b=0.1)), error=function(e){print(paste("fitting failed row:" ,i))})
+
+    
+    #Try fitting using nls2 (different starting values + optimization)
+    
+    st1 <- expand.grid(b = seq(0.05, 0.3, len = 10), a = seq(1, 1, len = 1))
+    fit = tryCatch(nls2(values ~ a*exp(-b*realt), data=list(realt,values), start=st1, algorithm = "brute-force"), error=function(e){print(paste("fitting failed row:" ,i))})
+    #fit = nls(values ~ a*exp(-b*realt), start = coef(fit))
+    
     
     ifelse(grepl("fitting failed",fit), slope <- NA, slope <- coef(fit)[["b"]])
-    
+    #print(coef(fit))
     #exclude correction coefficients from negative slopes or failed fitting
     if(grepl("fitting failed",fit)){
       corr_coeffs <- rbind(corr_coeffs, values*NA)
@@ -37,7 +53,7 @@ calculate_normalization_factors3 <- function(DGEList = obj, method = c("average"
       slopes <- c(slopes,NA)
     }
     else{
-      corr_coeffs <- rbind(corr_coeffs,fitted(fit)/data[i,])
+      corr_coeffs <- rbind(corr_coeffs,fitted(fit)/values)
       slopes <- c(slopes, slope)
     }
     
